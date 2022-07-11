@@ -8,19 +8,23 @@ declare global {
   var signin: () => string[];
 }
 
+jest.mock('../nats-wrapper');
+
+
 let mongo: any;
 beforeAll(async () => {
   process.env.JWT_KEY = 'asdfasdf';
 
   mongo = await MongoMemoryServer.create();
   const uri = mongo.getUri();
-
+  
   await mongoose.connect(uri);
 });
 
 beforeEach(async () => {
-  const collections = await mongoose.connection.db.collections();
+  jest.mock('../nats-wrapper');
 
+  const collections = await mongoose.connection.db.collections();
   for (let collection of collections) {
     await collection.deleteMany({});
   }
