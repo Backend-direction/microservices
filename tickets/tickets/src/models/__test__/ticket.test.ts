@@ -34,9 +34,9 @@ it('increments the version  number on multiple saves', async () => {
     userId: '123'
   });
 
-  ticket.save();
+  await ticket.save();
   expect(ticket.version).toEqual(0);
 
-  ticket.save();
+  await ticket.save();
   expect(ticket.version).toEqual(1);
 });
