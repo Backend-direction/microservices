@@ -1,7 +1,10 @@
 import { BadRequestError, NotAuthorizedError, NotFoundError, OrderStatus, requireAuth, validateRequest } from '@vpankitickets/common';
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
+import { PaymentCretaedPublisher } from '../events/publishers/payment-created-publisher';
 import { Order } from '../models/order';
+import { Payment } from '../models/payments';
+import { natsWrapper } from '../nats-wrapper';
 import { stripe } from '../stripe';
 
 
@@ -32,7 +35,25 @@ router.post(
       throw new BadRequestError('Order was cancelled');
     }
 
-    res.send(true)
+    const charge = await stripe.charges.create({
+      currency: 'usd',
+      amount: order.price * 100,
+      source: token
+    });
+
+    const payment = Payment.build({
+      orderId,
+      stripeId: charge.id
+    });
+    await payment.save();
+
+    await new PaymentCretaedPublisher(natsWrapper.client).publish({
+      id: payment.id,
+      orderId: payment.orderId,
+      stripeId: payment.stripeId
+    });
+
+    res.status(201).send({ id: payment.id });
 });
 
 export { router as cretaeChatrgeRouter };
