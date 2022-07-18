@@ -1,4 +1,4 @@
-name: Tests
+name: Test orders
 
 on: pull_request
 
@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Auth test
-        working-directory: ./tickets/auth
+      - name: Orders test
+        working-directory: ./tickets/orders
         run: |
           npm install && npm run test:ci
