@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '/tickets/infra/**'
+      - 'tickets/infra/**'
 
 jobs:
   build:
