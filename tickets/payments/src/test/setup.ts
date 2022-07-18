@@ -23,6 +23,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   jest.mock('../nats-wrapper');
+  jest.setTimeout(60000);
 
   const collections = await mongoose.connection.db.collections();
   for (let collection of collections) {
